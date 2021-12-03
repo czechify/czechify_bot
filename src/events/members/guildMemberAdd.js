@@ -15,24 +15,21 @@ module.exports = async (client, member) => {
     let welcomeMsg = new discord.MessageEmbed()
         .setColor('#ffa530')
         .setTitle('Vítej, ' + member.displayName + '!')
-        .setDescription(`:flag_cz: __**Vítejte na CZECHIFY**, hlavním výukovém serveru Česka__!
+        .setDescription(`:flag_cz: __**Vítám tě na ČEŠTINĚ**, hlavním serveru Česka__!
 
-        •  Pro začátek si nastavte úroveň češtiny a svou rodnou zemi!
-        •  Nebojte se kdykoli napsat do <#433946325969797133>, zeptat v <#434230418334547968> nebo se můžete připojit do hlasového kanálu!
-        •  V <#770734721835073566> se můžete učit nová slovíčka s pomocí **/slovo**!
-        •  Jestli budete potřebovat pomoc, napište adminům!
-        •  Podivejte se na náš YouTube kanál:
-           https://youtube.com/channel/UChlYCUWTihnOVKbop8Gosjw/
+        •  Pro začátek si nastav úroveň češtiny a svou rodnou zemi!
+        •  Neboj se kdykoli napsat do <#433946325969797133>, zeptat v <#434230418334547968> nebo se připojit do hlasového kanálu!
+        •  V # bot se můžeš učit nová slovíčka s pomocí **slovo**!
+        •  Jestli budeš potřebovat pomoc napiš adminům!
 
 
-        :flag_gb: __**Welcome to CZECHIFY**, the Czech learning server__!
+        :flag_gb: __**Welcome to CZECH**, the main Czech server__!
 
-        •  First, set your Czech level and your country!
-        •  Don't be afraid to send messages in <#433946325969797133> at any time, ask in <#434230418334547968> or you can join a voice channel!
-        •  In <#770734721835073566> you can learn new words with **/word**!
-        •  If you need help feel free to message an admin!
-        •  Check out our YouTube channel:
-           https://youtube.com/channel/UChlYCUWTihnOVKbop8Gosjw/`);
+        •  Firstly, set your Czech level and your country!
+        •  Don't be afraid to write to <#433946325969797133> at any time, ask in <#434230418334547968> or join the voice channel!
+        •  In # bot you can learn new vocabulary with **word**!
+        •  If you need help message the admins!`
+        );
     member.send(welcomeMsg).then((msg) => { msg.delete({ timeout: time }).catch((e) => {}) })
 
     var channel = await global.findChannels(3, member.guild, ["welcome", "vitej", "vitejte"], ["text"])
@@ -62,7 +59,7 @@ module.exports = async (client, member) => {
             { name: `${emojis[4]} **Native speaker** - That's apparent :sunglasses:`, value: `${emojis[4]} **Rodilý mluvčí** - No to je jasné :sunglasses:` },
         )
     var ReactionMessage = await channel.send(embed)
+    global.levelMessages.push(ReactionMessage.id);
     setTimeout(function() { ReactionMessage.delete() }, time)
     await global.react(ReactionMessage, [emojis[1], emojis[3], emojis[0], emojis[2], emojis[4]]);
-    ReactionMessage.changeLevelMessage = true;
 }

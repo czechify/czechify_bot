@@ -1,11 +1,22 @@
+require('dotenv').config();
 const fetch = require('node-fetch');
 global.isBumped = false;
+global.levelMessages = [];
 global.translateToken = {token: "", time: 0}
-global.allowedUsers = ["243425689376653312", "270973904359653387", "298873046696067072"]
-global.react = async function(msg, emojis) { try { emojis.forEach((emoji) => msg.react(emoji)) }catch{ } }
-global.removeAccents = function(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
-String.prototype.l = function() { return this.toLowerCase(); }
-String.prototype.cu = function() { return global.removeAccents(this.toLowerCase()); }
+global.allowedUsers = ["243425689376653312", "270973904359653387"]
+global.react = async function(msg, emojis) {
+    try { emojis.forEach((emoji) => msg.react(emoji)) }catch{ }
+}
+global.removeAccents = function(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+String.prototype.l = function() {
+    return this.toLowerCase();
+}
+String.prototype.cu = function() {
+    return global.removeAccents(this.toLowerCase());
+}
+
 global.getToken = async function() {
     const response = await fetch("https://iam.api.cloud.yandex.net/iam/v1/tokens", {
         method: 'POST',
@@ -165,6 +176,8 @@ const client = new discord.Client({ partials: ['MESSAGE', 'REACTION']});
 const fs = require('fs').promises;
 const path = require('path');
 const { checkCommandModule, checkProperties } = require('./utils/validate')
+const c = require('ansi-colors');
+const commandStatus = [[`${c.bold('Command')}`, `${c.bold('Status')}`]];
 
 const cachedMessageReactions = new Map();
 
@@ -182,9 +195,15 @@ client.commands = {};
                 if ((checkCommandModule(cmdName, cmdModule))&(checkProperties(cmdName, cmdModule))) {
                     let { aliases, allowedIn, descriptionCZ, descriptionEN, czAlias } = cmdModule;
                     client.commands[cmdName] = [cmdModule.run, allowedIn, dir.substring(9), descriptionCZ, descriptionEN, cmdName, czAlias];
-                    if(aliases.length) aliases.forEach(alias => client.commands[alias] = [cmdModule.run, allowedIn, dir.substring(9), descriptionCZ, descriptionEN, cmdName, czAlias]);
+                    if(aliases.length) {
+                        aliases.forEach(alias => client.commands[alias] = [cmdModule.run, allowedIn, dir.substring(9), descriptionCZ, descriptionEN, cmdName, czAlias]);
+                        commandStatus.push([`${c.cyan(`${cmdName}`)}`, `${c.black.bgGreenBright('Success')}`])
+                    }
                 }
-            }catch(err){ }
+            }catch(err){
+                console.log(err);
+                commandStatus.push([`${c.white(`${cmdName}`)}`, `${c.bgRedBright('Success')}`])
+            }
         }
     }
 })();
@@ -193,6 +212,33 @@ client.commands = {};
     let files = await fs.readdir(path.join(__dirname, dir));
     for (let file of files) {
         let stat = await fs.lstat(path.join(__dirname, dir, file));
-        if(stat.isDirectory()) registerEvents(path.join(dir, file)); else if (file.endsWith(".js")) try{ client.on(file.substring(0, file.indexOf(".js")), require(path.join(__dirname, dir, file)).bind(null, client)); }catch(err){ console.log(err); }
+        if(stat.isDirectory())
+            registerEvents(path.join(dir, file));
+        else{
+            if (file.endsWith(".js")){
+                let eventName = file.substring(0, file.indexOf(".js"));
+                try{
+                    let eventModule = require(path.join(__dirname, dir, file));
+                    client.on(eventName, eventModule.bind(null, client));
+                //     if(checkCommandModule(eventName, cmdModule)) {
+                //         if(checkProperties(eventName, cmdModule)) {
+                //             let { aliases } = cmdModule;
+                //             client.commands.set(cmdName, cmdModule.run);
+                //             if(aliases.lenght !== 0) {
+                //                 aliases.forEach(alias => client.commands.set(alias, cmdModule.run));
+                //             commandStatus.push(
+                //                 [`${c.cyan(`${cmdName}`)}`, `${c.black.bgGreenBright('Success')}`]
+                //             )
+                //             }
+                //     }
+                // }
+                }catch(err){
+                    console.log(err);
+                    commandStatus.push(
+                        [`${c.white(`${eventName}`)}`, `${c.bgRedBright('Success')}`]
+                    )
+                }
+            }
+        }
     }
 })();

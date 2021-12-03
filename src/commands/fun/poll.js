@@ -9,7 +9,7 @@ module.exports = {
             var embed = new discord.MessageEmbed()
                 .setDescription(args.join(" "))
                 .setColor('#dbe9ff')
-            message.channel.send(embed).then((msg) => { msg.poll = true; global.react(msg, ["👍", "👎"]); msg.delete({ timeout: 86400000 }) });
+            message.channel.send(embed).then((msg) => { global.react(msg, ["👍", "👎"]); msg.delete({ timeout: 86400000 }) });
         }else {
             var embed = new discord.MessageEmbed()
                 .setColor("#d7141a")

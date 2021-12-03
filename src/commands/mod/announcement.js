@@ -6,8 +6,6 @@ module.exports = {
         module.exports.aliases.forEach((alias) => { if (args[0].includes(alias)) canDo = false; })
         if (global.allowedUsers.includes(message.author.id)) {
             if (canDo) {
-                args = message.content.split(' ');
-                args.shift();
                 message.guild.channels.cache.forEach((channel) => { if (channel.name.includes("announcements")) channel.send(args.join(" ")); })
                 message.reply("All done!").then((msg) => { msg.delete({ timeout: 5000 }).catch((e) => {}) })
                 if (message.guild) message.delete();
