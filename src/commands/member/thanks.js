@@ -1,54 +1,122 @@
 const discord = require('discord.js');
-const fetch = require('node-fetch');
 
-async function SaveToDB(questioner, answerer) {
-    var answers = await Stats.findOneAndUpdate({ userID: answerer }, { $inc: { answers: 1 } }, {new: true});
-    var questions = await Stats.findOneAndUpdate({ userID: questioner }, { $inc: { questions: 1 } }, {new: true});
-
-}
 
 module.exports = {
     run: async (client, message, args) => {
-        var thanksDB = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=fetch").then(res => res.text())
-        if (thanksDB.includes('<')) var thanksDB = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=fetch").then(res => res.text())
-        thanksDB = JSON.parse(thanksDB);
-        if (!(message.mentions.members.first())) {
-            var embed = new discord.MessageEmbed()
-                .setColor("#ffa530")
-                .setDescription(':flag_gb: Please mention who you want to thank! (one person)\n:flag_cz: Prosím označ komu děkuješ! (jednoho člověka)')
-            message.channel.send(embed).then(msg => { msg.delete({ timeout: 10000 }).catch((e) => {}) });
-            return;
-        }
-        if (message.mentions.members.first().id == message.author.id) {
-            var emoji = await global.findEmoji(message.guild, 'thinkingbeer');
-            var embed = new discord.MessageEmbed()
-                .setColor("#ffa530")
-                .setDescription(':flag_gb: Who thanks themselves? <:' + emoji.name + ':' + emoji.id + '>\n:flag_cz: Kdo děkuje sám sobě? <:' + emoji.name + ':' + emoji.id + '>')
-            message.channel.send(embed).then(msg => { msg.delete({ timeout: 10000 }).catch((e) => {}) });
-            return;
-        }
-        if ((thanksDB[message.author.id])&&(thanksDB.length)&&(((thanksDB.slice(-1).pop()['thanked'] == message.mentions.members.first())&&(thanksDB.slice(-1).pop()['time'] > new Date().getTime() / 1000 - 60))||((!(thanksDB.slice(-1).pop()['thanked'] == message.mentions.members.first()))&&(thanksDB.slice(-1).pop()['time'] > new Date().getTime() / 1000 - 5)))) {
-            var embed = new discord.MessageEmbed()
+        /*
+        if (talkedRecently.has(message.author.id)) {
+            let embed = new discord.MessageEmbed()
                 .setColor("#ff3c36")
-                .setDescription(':flag_gb: Don\'t thank so often please! :scream:\n:flag_cz: Neděkuj tak často prosím! :scream:')
-            message.channel.send(embed).then(msg => { msg.delete({ timeout: 10000 }).catch((e) => {}) });
-            return;
+                .addFields(
+                    { name: ':flag_gb:\u200B', value: `Don't thank so often please! :scream:` },
+                    { name: ':flag_cz:\u200B', value: `Neděkuj tak často prosím! :scream:` }
+                )
+                message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+                message.delete();
+        } else {
+
+        
+            mongoose.connect('mongodb://localhost:27017/UserStats', { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+                if (err) {
+                    console.error(err)
+                    return
+                }
+            });
+
+            var db = mongoose.connection;
+            db.on('error', console.error.bind(console, 'connection error:'));
+
+            db.once('open', async function () {
+                console.log("Connection Successful!");
+                if (!message.mentions.users.first()) {
+                    let embed = new discord.MessageEmbed()
+                        .setColor("#ffa530")
+                        .addFields(
+                            { name: ':flag_gb:\u200B', value: `Please mention who you want to thank! (one person)`},
+                            { name: ':flag_cz:\u200B', value: `Prosím označ komu děkuješ! (jednoho člověka)` },
+                        )
+                        message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+                    return;
+                } else {
+                let messageAuthor = message.author.id;
+                let mentionedUser = message.mentions.users.first().id;
+                console.log(mentionedUser);
+                let userDBId = await Stats.findOne({ userID: `${messageAuthor}` });
+                let mentionedUserDBId = await Stats.findOne({ userID: `${mentionedUser}` });
+                
+                //console.log(userDBId);
+                //console.log(mentionedUserDBId);
+                
+                    talkedRecently.add(message.author.id);
+                    setTimeout(() => {
+                      talkedRecently.delete(message.author.id);
+                    }, 60000);
+                    if (messageAuthor === mentionedUser){
+                        let embed = new discord.MessageEmbed()
+                        .setColor("#ffa530")
+                        .addFields(
+                            { name: ':flag_gb:\u200B', value: `Who thanks themselves? <:thinkingbeer:456741880923947010>`},
+                            { name: ':flag_cz:\u200B', value: `Kdo děkuje sám sobě? <:thinkingbeer:456741880923947010>` },
+                        )
+                        message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+                    }else{
+                    if (userDBId && mentionedUserDBId) {
+                        console.log("first");
+                        SaveToDB(messageAuthor, mentionedUser);
+
+                    } else {
+                        
+                        if (!userDBId) {
+                            var newStats = new Stats({
+                                userID: messageAuthor,
+                                timeInVoiceChatGeneral: 0,
+                                timeInVoiceChatCzech: 0,
+                                questions: 0,
+                                answers: 0
+                            });
+                            newStats.save(function (err, stats) {
+                                if (err) return console.error(err);
+                                //console.log(stats.userID + " saved to collection.");
+                            });
+
+                        }
+                        if (!mentionedUserDBId) {
+                            var newStats = new Stats({
+                                userID: mentionedUser,
+                                timeInVoiceChatGeneral: 0,
+                                timeInVoiceChatCzech: 0,
+                                questions: 0,
+                                answers: 0
+                            });
+
+                            newStats.save(function (err, stats) {
+                                if (err) return console.error(err);
+                                //console.log(stats.userID + " saved to collection.");
+                            });
+                        }
+                        setTimeout(function() {
+                            SaveToDB(messageAuthor, mentionedUser)                      
+                        }, 500);
+                    }
+
+                }
+            }
+                async function SaveToDB(questioner, answerer) {
+
+                    let answers = await Stats.findOneAndUpdate({ userID: answerer }, { $inc: { answers: 1 } }, {new: true});
+                    let questions = await Stats.findOneAndUpdate({ userID: questioner }, { $inc: { questions: 1 } }, {new: true});
+                    
+                    let embed = new discord.MessageEmbed()
+                    .setColor("#ffa530")
+                    .addFields(
+                        { name: ':tada: <:cz_heart:499237225406398464>', value: `\u200B\n**${message.guild.members.cache.get(answerer).displayName}** • ${answers.answers} <:cz_check:499237381635964929>\n**${message.guild.members.cache.get(questioner).displayName}** • ${questions.questions} <:cz_what:499237344478625832>` },
+                    )
+                    message.channel.send(embed);
+
+                }
+            });
         }
-        var thanksDB = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=log&data=" + encodeURI(JSON.stringify({ "thanker": message.author.id, "thanking": message.mentions.members.first().id, "message": 'https://discord.com/channels/' + message.guild.id + '/' + message.channel.id + '/' + message.id + '/' }))).then(res => res.text())
-
-        var thanksDB = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=fetch").then(res => res.text())
-        thanksDB = JSON.parse(thanksDB);
-
-        var emojis = global.sortByKey(await global.findEmojis(message.guild, 1, ["cz_check", "cz_what"]), "name");
-
-        var embed = new discord.MessageEmbed()
-            .setColor("#ffa530")
-            .setDescription('<@' + message.mentions.members.first().id + '>** • ' + thanksDB[message.mentions.users.first().id]['was_thanked'].length + ' <:' + emojis[0].name + ':' + emojis[0].id + '>**\n<@' + message.member.id + '>** • ' + thanksDB[message.member.id]['thanked'].length + ' <:' + emojis[1].name + ':' + emojis[1].id + '>**' )
-        message.channel.send(embed).then((msg) => { msg.delete({ timeout: 30000 }).catch((e) => {}) });
+        */
     },
-    descriptionCZ: "Poděkuj",
-    descriptionEN: "Thank someone",
-    allowedIn: ["guild"],
-    czAlias: "děkuji",
-    aliases: ['thanks', 'diky', 'dik', 'dekuji']
+    aliases: [""]
 }

@@ -3,10 +3,10 @@ const fetch = require('node-fetch');
 
 const playedRecently = new Set();
 var startTimeMS = 0;
-var timerStep = 1800000;
+var timerStep = 1800000; 
 time = 60000;
 
-function startTimer(playedRecently, timerStep, message) {
+function startTimer() {
     startTimeMS = (new Date()).getTime();
     setTimeout(() => { playedRecently.delete(message.author.id); }, timerStep );
 }
@@ -24,7 +24,7 @@ async function Start(count, allWords, theChannel, timerID, oldMsg, message, Reac
         .setDescription(theWord.wordEnglish)
         .setColor('#ffa530')
     let infoMsg = await theChannel.send(embed);
-
+    
     CheckAnswer(allWords, theWord, infoMsg, count, theChannel, ansCount, timerID, oldMsg, message, ReactionMessage)
     setTimeout(async function () {
         infoMsg.delete();
@@ -59,19 +59,24 @@ async function CheckAnswer(allWords, theWord, infoMsg, count, theChannel, ansCou
             if (typeof timer !== 'undefined') clearTimeout(timer);
             let timerID = setTimeout(async function () {
                 infoMsg.delete();
+
                 if (oldMsg !== undefined) oldMsg.delete();
+
                 let embed = new discord.MessageEmbed()
                     .setTitle(`Good game!`)
                     .setDescription(`⏰ Too slow!\n\n**__You got:__**\n**${ansCount}** answers\n**`+ Math.floor(ansCount/10) + `** new words!`)
                     .setColor('#ffa530');
                 theChannel.send(embed);
-                await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=addToUser&userID=" + userid + "&random&minmax&min=1&max=5").then(res => res.text())
+
+                var response = await fetch("https://najemi.cz/partners/plankto/?action=addToUser&userID=" + userid + "&random&minmax&min=1&max=5").then(res => res.text())
+
                 setTimeout(function () {
                     ReactionMessage.edit();
                     theChannel.delete();
                 }, 20000);
                 return;
             }, 30000);
+
             if (questionAmt == maxQuestionAmt) {
                 if (oldMsg !== undefined) oldMsg.delete();
                 infoMsg.delete();
@@ -83,6 +88,7 @@ async function CheckAnswer(allWords, theWord, infoMsg, count, theChannel, ansCou
                 setTimeout(function () { theChannel.delete(); }, 20000);
                 return;
             }
+
             if (oldMsg !== undefined) {
                 oldMsg.edit(`<:czechcheck:694569579707367474> ${theWord.wordCzech}`);
                 EditMessage(allWords, infoMsg, count, theChannel, ansCount, timerID, oldMsg, message, ReactionMessage);
@@ -91,15 +97,17 @@ async function CheckAnswer(allWords, theWord, infoMsg, count, theChannel, ansCou
                 EditMessage(allWords, infoMsg, count, theChannel, ansCount, timerID, newMsg, message, ReactionMessage);
                 return;
             }
-        }else {
+        } else {
             collector.stop()
             if (oldMsg !== undefined) oldMsg.delete();
             infoMsg.delete();
+
             let embed = new discord.MessageEmbed()
                 .setTitle(`Good game!`)
                 .setDescription(`🇬🇧 ${theWord.wordEnglish}\n<:ceskyprosim:694569579678007386> ${hisMsg.content} => ${theWord.wordCzech} <:czechcheck:694569579707367474>\n\n**__You got:__**\n**${ansCount}** answers\n**`+ Math.floor(ansCount/10) + `** new words!`)
                 .setColor('#ffa530');
             theChannel.send(embed);
+
             setTimeout(function () {
                 let embed = new discord.MessageEmbed()
                     .setTitle(`Super!`)
@@ -118,22 +126,30 @@ module.exports = {
         if (playedRecently.has(message.author.id)) {
             remainingTimeMS = await timeGet();
             var remainingTimeMIN = Math.floor(remainingTimeMS / 60000);
+            
             let embed = new discord.MessageEmbed()
                 .setColor("#ff3c36")
-                .addFields( { name: ':flag_gb:\u200B', value: `You can play in **${remainingTimeMIN}** minutes!` }, { name: ':flag_cz:\u200B', value: `Můžeš hrát za **${remainingTimeMIN}** minut!` })
+                .addFields( { name: ':flag_gb:\u200B', value: `You can play in **${remainingTimeMIN}** minutes!` }, { name: ':flag_cz:\u200B', value: `Můžeš hrát za **${remainingTimeMIN}** minut!` }    
+                )
                 .setThumbnail("https://i.imgur.com/5UxthxL.png");
-            message.channel.send(embed).then(msg => { msg.delete({ timeout: 5000 }).catch((e) => {}) });
+
+            message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
             message.delete();
             return;
         }else {
             playedRecently.add(message.author.id)
-            startTimer(playedRecently, timerStep, message);
+            startTimer();
+
             username = message.member.displayName;
             userid = message.author.id;
-            var userData = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + userid).then(res => res.text())
+
+            var userData = await fetch("https://najemi.cz/partners/plankto/?action=getUserData&userID=" + userid).then(res => res.text())
+
             userData = JSON.parse(userData);
+
             var allWords = userData['words'];
             var userWordCount = userData['words'].length;
+
             if (userWordCount < 10) {
                 let embed = new discord.MessageEmbed()
                     .setTitle(`Nemůžeš!`)
@@ -143,6 +159,7 @@ module.exports = {
                 message.channel.send(embed)
                 return;
             }
+
             let embed = new discord.MessageEmbed()
                 .setTitle(`Začít?`)
                 .setDescription('Chceš teda hrát?')
@@ -150,29 +167,33 @@ module.exports = {
                 .setColor('#ffa530');
 
             let ReactionMessage = await message.channel.send(embed)
+            
             ReactionMessage.react("✅");
             ReactionMessage.react("❌");
-            var learningCZID = await global.findARole(message.guild, 0, "Learning Czech");
-            learningCZID = learningCZID.id
+
             const YesNofilter = (reaction, user) => { return ["✅", "❌"].includes(reaction.emoji.name) && user.id === message.author.id; };
             const tradeCollector = ReactionMessage.createReactionCollector(YesNofilter, { max: 1, time: time });
+
             tradeCollector.on('collect', async (reaction, reactionCollector) => {
                 if (reaction.emoji.name == '✅') {
                     let timerID;
                     let oldMsg;
-                    var category = client.channels.cache.find(role => role.name === "Ongoing Games (/play)");
+
+                    var category = client.channels.cache.find(role => role.name === "current games (/play)");
                     let theChannel = await message.guild.channels.create(username, {
                         type: 'text',
                         parent: category,
                         permissionOverwrites: [
-                            { id: message.guild.id, deny: ['SEND_MESSAGES'], },
+                            { id: message.member.guild.id, deny: ['SEND_MESSAGES'], },
                             { id: message.author.id, allow: ['SEND_MESSAGES'], },
                         ],
                     });
+
                     let embedder = new discord.MessageEmbed()
                         .setTitle('Hraj!')
-                        .setDescription(`Začala ti hra v ${theChannel}!`)
+                        .setDescription(`Začala ti hra v ${theChannel}`)
                         .setColor('#ffa530');
+
                     ReactionMessage.reactions.removeAll().then(async () => {
                         let playingMessage = await ReactionMessage.edit(embedder)
                         Start(0, allWords, theChannel, timerID, oldMsg, message, ReactionMessage);
@@ -189,9 +210,5 @@ module.exports = {
         }
         message.delete();
     },
-    descriptionCZ: "Hrát hru se slovy!",
-    descriptionEN: "Play the word game!",
-    allowedIn: ["guild"],
-    czAlias: "hrát",
-    aliases: ['play', 'hrat', 'game', 'wordgame']
+    aliases: ['hrat, game, wordgame']
 }

@@ -1,7 +1,9 @@
 const cachedMessageReactions = new Map();
 
-
 module.exports = async(client, member, user) => {
+
+
+
     // let removeMemberRole = (emojiRoleMappings) => {
     //     if(emojiRoleMappings.hasOwnProperty(reaction.emoji.id)) {
     //         let roleId = emojiRoleMappings[reaction.emoji.id];
@@ -32,3 +34,4 @@ module.exports = async(client, member, user) => {
     //         addMemberRole(emojiRoleMappings);
     //     }
 }
+

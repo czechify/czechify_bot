@@ -1,24 +1,31 @@
 const discord = require('discord.js');
 const fetch = require('node-fetch');
-
 module.exports = {
-    run: async (client, message, args) => {
-        message.delete();
-        let userid = message.author.id;
-        var allWords = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + userid).then(res => res.text())
+    run: async (client, msg, args) => {
+        let userid = msg.author.id;
+        var allWords = await fetch("https://najemi.cz/partners/plankto/?action=getUserData&userID=" + userid).then(res => res.text())
         if (allWords == "User not found") {
-            message.channel.send("We cannot find you in our database. Sorry.");
+            msg.channel.send("We cannot find you in our database. Sorry.");
             return;
         }
         allWords = JSON.parse(allWords)['words'];
         var words = new Array();
         var wordsEN = new Array();
-        allWords.forEach(async function (word, i) {
-            var emojis = global.sortByKey(await global.findEmojis(message.guild, 1, ["_beginner", "_intermediate", "_fluent"]), "name");
-            if ((word.value <= 3)&&(word.value >= 1)) var dot = emojis[0];
-            if ((word.value <= 7)&&(word.value >= 4)) var dot = emojis[1];
-            if ((word.value <= 10)&&(word.value >= 8)) var dot = emojis[2];
-            words[i] = '<:' + dot.name + ':' + dot.id + '>' + " " + word.wordCzech;
+        allWords.forEach(async function (item, i) {
+            let word = item
+            let dot;
+            switch (true) {
+                case (word.value <= 4):
+                    dot = "<:_beginnner:694924576827899996>"
+                    break;
+                case (word.value > 4 && word.value <= 7):
+                    dot = "<:_intermediate:694924577037484114>"
+                    break;
+                case (word.value > 7 && word.value <= 10):
+                    dot = "<:_advanced:694924577129889804>"
+                    break;
+            }
+            words[i] = dot + " " + word.wordCzech;
             wordsEN[i] = word.wordEnglish;
             if (i === allWords.length - 1) {
                 TheEmbed()
@@ -38,30 +45,34 @@ module.exports = {
                         { name: 'Anglicky', value: currentEN.toString().split(",").join("\n"), inline: true })
                 return embed;
             }
-            var author = message.author;
-            message.channel.send(generateEmbed(0)).then(message => {
-                message.delete({ timeout: 120000 });
+            const author = msg.author
+            msg.channel.send(generateEmbed(0)).then(message => {
+                // exit if there is only one page of words (no need for all of this)
                 if (words.length <= 10) return
+                // react with the right arrow (so that the user can click it) (left arrow isn't needed because it is the start)
                 message.react('➡️')
                 const collector = message.createReactionCollector(
+                    // only collect left and right arrow reactions from the message author
                     (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === author.id,
+                    // time out after a minute
                     { time: 60000 }
                 )
-                var currentIndex = 0
+                let currentIndex = 0
                 collector.on('collect', reaction => {
+                    // remove the existing reactions
                     message.reactions.removeAll().then(async () => {
+                        // increase/decrease index
                         reaction.emoji.name === '⬅️' ? currentIndex -= 10 : currentIndex += 10
+                        // edit message with new embed
                         message.edit(generateEmbed(currentIndex))
+                        // react with left arrow if it isn't the start (await is used so that the right arrow always goes after the left)
                         if (currentIndex !== 0) await message.react('⬅️')
+                        // react with right arrow if it isn't the end
                         if (currentIndex + 10 < words.length) message.react('➡️')
                     })
                 })
             })
         }
     },
-    descriptionCZ: "Tvůj seznam slov",
-    descriptionEN: "Your word collection",
-    allowedIn: ["guild"],
-    czAlias: "slova",
-    aliases: ['mywords', 'slova', 'maslova', 'mojeslova']
+    aliases: ['slova', 'maslova', 'mojeslova']
 }
