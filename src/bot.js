@@ -1,8 +1,9 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 global.isBumped = false;
+global.levelMessages = [];
 global.translateToken = {token: "", time: 0}
-global.allowedUsers = ["243425689376653312", "270973904359653387", "298873046696067072"]
+global.allowedUsers = ["243425689376653312", "270973904359653387"]
 global.react = async function(msg, emojis) {
     try { emojis.forEach((emoji) => msg.react(emoji)) }catch{ }
 }

@@ -59,7 +59,7 @@ module.exports = async (client, member) => {
             { name: `${emojis[4]} **Native speaker** - That's apparent :sunglasses:`, value: `${emojis[4]} **Rodilý mluvčí** - No to je jasné :sunglasses:` },
         )
     var ReactionMessage = await channel.send(embed)
+    global.levelMessages.push(ReactionMessage.id);
     setTimeout(function() { ReactionMessage.delete() }, time)
     await global.react(ReactionMessage, [emojis[1], emojis[3], emojis[0], emojis[2], emojis[4]]);
-    ReactionMessage.changeLevelMessage = true;
 }

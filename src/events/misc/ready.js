@@ -47,7 +47,9 @@ module.exports = async (client) => {
         var members = await guild.members.fetch();
         members.forEach((member) => {
             var hasARole = false;
-            roles.forEach(async (role) => { if ((member.roles.cache.has(role.id))||(member.user.bot)) hasARole = true; })
+            roles.forEach(async (role) => {
+                if ((member.roles.cache.has(role.id))||(member.user.bot)) hasARole = true;
+            })
             if ((!(hasARole))&&(roles[0])&&(roles[1])&&(roles[2])&&(roles[3])&&(roles[4])&&(roles[5])) {
                 let welcomeMsg = new discord.MessageEmbed()
                     .setColor('#ffa530')
