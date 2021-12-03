@@ -22,8 +22,8 @@ module.exports = {
             message.channel.send(embed).then(msg => { msg.delete({ timeout: 10000 }).catch((e) => {}) });
         }
     },
-    descriptionCZ: 'Zkrášli své myšlenky',
-    descriptionEN: 'Prettify your thoughts',
+    descriptionCZ: "Zkrášli své myšlenky",
+    descriptionEN: "Prettify your thoughts",
     allowedIn: ['guild'],
     czAlias: "citát",
     aliases: ['quote', 'quoteme', 'isaid', 'citation', 'citat']

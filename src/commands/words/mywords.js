@@ -5,7 +5,7 @@ module.exports = {
     run: async (client, message, args) => {
         message.delete();
         let userid = message.author.id;
-        var allWords = await fetch("https://najemi.cz/czechifyapi/words/?action=getUserData&userID=" + userid).then(res => res.text())
+        var allWords = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + userid).then(res => res.text())
         if (allWords == "User not found") {
             message.channel.send("We cannot find you in our database. Sorry.");
             return;

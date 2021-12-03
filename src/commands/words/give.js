@@ -1,65 +1,52 @@
 const discord = require('discord.js');
 const fetch = require('node-fetch');
 
+const gotRecently = new Set();
+var startTimeMS = 0;  // EPOCH Time of event count started
+var timerStep = 1200000;   // Time beetwen calls
 
+function toTitles(s){ return s.replace(/\w\S*/g, function(t) { return t.charAt(0).toUpperCase() + t.substr(1).toLowerCase(); }); }
 
 module.exports = {
     run: async (client, message, args) => {
         message.delete();
-
-        // var text = await data.text();
-        // message.reply(text);
-
-        return;
-
-        var czechifyID = await fetch('https://najemi.cz/czechifyapi/userID.php?userID=' + message.author.id + '&userIDType=discord', {headers: {'Authorization': global.apiAuth[0]}});
-        czechifyID = await czechifyID.json();
-        if (czechifyID['error']) {
-            console.log(czechifyID['error']);
-            return
-        }
-        if (czechifyID['success']['output'][0]['Account ID']) czechifyID = czechifyID['success']['output'][0]['Account ID']; else { console.log(czechifyID); return; }
-
-        var wordData = await fetch('https://najemi.cz/czechifyapi/words/?action=giveWord&userID=' + czechifyID, {headers: {'Authorization': global.apiAuth[0]}});
-        wordData = await wordData.json();
-
-        if (wordData['error']) {
-            if (wordData['error']['code'] == 500) { console.log(wordData); return; }
-            var currentError = wordData['error']['errors'][wordData['error']['errors'].length - 1];
-            if (currentError['flag'] == 'TOO_FAST') {
-                var data = await fetch(global.webServer + 'translate.php?fromLang=EN_GB&toLang=CS_CZ&text=' + encodeURIComponent('You already have **all** the words!'));
-                var text = await data.text();
-                message.reply(text);
-                return;
-                var remainingTimeEN = '';
-                if (currentError['time'] > 60) {
-                    remainingTimeEN = Math.floor(currentError['time'] / 60) + ' minutes and ' + Math.round(currentError['time'] % 60) + ' seconds';
-                    remainingTimeCS = Math.floor(currentError['time'] / 60) + ' minuty a ' + Math.round(currentError['time'] % 60) + ' sekund';
-                }else {
-                    remainingTimeEN = currentError['time'] + ' seconds';
-                    remainingTimeCS = currentError['time'] + ' sekund';
-                }
-                global.embedify(message, ['Too fast! You can get a new word in'], '#ff3c36', '', '', true);
-                var embed = new discord.MessageEmbed()
-                    .setColor("#ff3c36")
-                    .setDescription(':flag_cz: Příliš brzo! Nové slovo dostaneš za ' + remainingTimeCS + '!\n\n:flag_gb: Too fast! You can get a new word in ' + remainingTimeEN + '!')
-                    .setFooter(message.member.displayName + '\n' + message.content, message.member.user.displayAvatarURL())
-                message.channel.send(embed).then(msg => { msg.delete({ timeout: 10000 }).catch((e) => {}) });
-            }else if (currentError['flag'] == 'HAS_ALL') {
-                global.embedify(message, ['You already have **all** the words!'], '#59ea00', '', '', true);
-            }else console.log(currentError);
-        }else if ((wordData['success'])&&(wordData['success']['code'] == 200)) {
-            var recentOutput = wordData['success']['output'][wordData['success']['output'].length - 1];
-            if (recentOutput['message'] == 'Word added.') {
-                var word = recentOutput['word_data'];
+        if (gotRecently.has(message.author.id)) {
+            remainingTimeMS = timerStep - ((new Date()).getTime() - startTimeMS);
+            var remainingTimeMIN = Math.floor(remainingTimeMS / 60000);
+            let embed = new discord.MessageEmbed()
+                .setColor("#ff3c36")
+                .addFields(
+                    { name: ':flag_gb:\u200B', value: `Next word in **${remainingTimeMIN}** minutes!` },
+                    { name: ':flag_cz:\u200B', value: `Nové slovo za **${remainingTimeMIN}** minut!` }
+                ).setThumbnail("https://i.imgur.com/5UxthxL.png");
+            message.channel.send(embed).then(msg => { msg.delete({ timeout: 5000 }).catch((e) => {}) });
+            return;
+        }else {
+            gotRecently.add(message.author.id)
+            startTimeMS = (new Date()).getTime();
+            setTimeout(() => { gotRecently.delete(message.author.id); }, timerStep);
+            let userid = message.author.id;
+            var response = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=addToUser&userID=" + userid + "&random&minmax&min=1&max=3").then(res => res.text())
+            if (response.includes("Added word: ")) {
+                var wordID = response.split("Added word: ")[1];
+                var response = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=viewAllWords").then(res => res.text())
+                response = JSON.parse(response);
+                var word = response[wordID];
                 let embed = new discord.MessageEmbed()
                     .setColor("#59ea00")
-                    .setFooter(message.member.displayName + '\n' + message.content, message.member.user.displayAvatarURL())
+                    .setFooter(message.member.displayName, message.member.user.displayAvatarURL())
                     .setTitle("Máš nové slovo")
-                    .setDescription(':flag_cz: Teď máš slovo **' + global.titleCase(word.word_target) + '**!\n\n:flag_gb: You now have the word **' + global.titleCase(word.word_base) + '**!')
-                message.channel.send(embed);
-            }else console.log(recentOutput);
-        }else console.log(wordData);
+                    .addFields({ name: '\u200B', value: `:flag_cz: Teď máš slovo **${toTitles(word.wordCzech)}**!\n:flag_gb: You now have the word **${toTitles(word.wordEnglish)}**!\r\n\u200B` },)
+                message.channel.send(embed).then((msg) => { msg.delete({timeout: 15000}).catch((e) => {}) });
+            }else if (response == "User has all applicable words"){
+                let embed = new discord.MessageEmbed()
+                    .setColor("#59ea00")
+                    .setFooter(message.member.displayName, message.member.user.displayAvatarURL())
+                    .setTitle("Máš to!")
+                    .addFields({ name: '\u200B', value: `:flag_cz: Už máš **všechna** slova!\n:flag_gb: You already have **all** the words!\r\n\u200B` })
+                message.channel.send(embed).then((msg) => { msg.delete({timeout: 15000}).catch((e) => {}) });
+            }else msg = message.channel.send(response).then((msg) => { msg.delete({timeout: 10000}).catch((e) => {}) })
+        }
     },
     descriptionCZ: "Získej nové slovo",
     descriptionEN: "Get a new word",

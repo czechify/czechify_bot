@@ -13,8 +13,8 @@ async function trade(minRemoval, maxRemoval, quantityToRemove, minGiving, maxGiv
     reactionMessage.edit(embed);
     reactionMessage.reactions.removeAll();
 
-    var allWords = JSON.parse(await fetch("https://najemi.cz/czechifyapi/words/?action=viewAllWords").then(res => res.text()))
-    var userData = JSON.parse(await fetch("https://najemi.cz/czechifyapi/words/?action=getUserData&userID=" + message.author.id).then(res => res.text()))['words']
+    var allWords = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=viewAllWords").then(res => res.text()))
+    var userData = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + message.author.id).then(res => res.text()))['words']
 
     //These next few lines check to see if they already have all of the type of word they're trying to get
     var canBeGiven = [];
@@ -30,12 +30,12 @@ async function trade(minRemoval, maxRemoval, quantityToRemove, minGiving, maxGiv
 
     var wordIDsRemoved = [];
     while (wordIDsRemoved.length < quantityToRemove) {
-        var response = await fetch("https://najemi.cz/czechifyapi/words/?action=removeFromUser&random&minmax&minValue=" + minRemoval.toString() + "&maxValue=" + maxRemoval.toString() + "&userID=" + message.author.id).then(res => res.text())
+        var response = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=removeFromUser&random&minmax&minValue=" + minRemoval.toString() + "&maxValue=" + maxRemoval.toString() + "&userID=" + message.author.id).then(res => res.text())
         if ((response == "User doesn't exist")||(response == "User doesn't have any applicable words")) return "You do not have enough words to complete this action"; else if (response.includes("Removed word: ")) wordIDsRemoved.push(response.replace("Removed word: ", ""))
     }
 
-    var response = await fetch("https://najemi.cz/czechifyapi/words/?action=addToUser&random&minmax&minValue=" + minGiving.toString() + "&maxValue=" + maxGiving.toString() + "&userID=" + message.author.id).then(res => res.text())
-    if ((response == 'User has all applicable words')||(response == 'User already has word')||(response == 'WordID does not exist')||(response == 'You missed something')) var response = await fetch("https://najemi.cz/czechifyapi/words/?action=addToUser&random&minmax&minValue=" + minGiving.toString() + "&maxValue=" + maxGiving.toString() + "&userID=" + message.author.id).then(res => res.text())
+    var response = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=addToUser&random&minmax&minValue=" + minGiving.toString() + "&maxValue=" + maxGiving.toString() + "&userID=" + message.author.id).then(res => res.text())
+    if ((response == 'User has all applicable words')||(response == 'User already has word')||(response == 'WordID does not exist')||(response == 'You missed something')) var response = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=addToUser&random&minmax&minValue=" + minGiving.toString() + "&maxValue=" + maxGiving.toString() + "&userID=" + message.author.id).then(res => res.text())
     if ((response == 'User has all applicable words')||(response == 'User already has word')||(response == 'WordID does not exist')||(response == 'You missed something')) return "An unexpected error occured";
 
     if (response.includes('Added word: ')) {
@@ -118,7 +118,7 @@ async function enterMarket(reactionMessage, emojis, message) {
 module.exports = {
     run: async (client, message, args) => {
         message.delete();
-        var allWords = await fetch("https://najemi.cz/czechifyapi/words/?action=getUserData&userID=" + message.author.id).then(res => res.text())
+        var allWords = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + message.author.id).then(res => res.text())
         if (allWords == "User not found") return "Sorry, we cannot find you in our database.";
         allWords = JSON.parse(allWords)['words'];
         var emojis = global.sortByKey(await global.findEmojis(message.guild, 1, ["_beginner", "_intermediate", "_fluent"]), "name");

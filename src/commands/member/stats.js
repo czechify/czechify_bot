@@ -41,13 +41,13 @@ module.exports = {
             var embedTitle = '__' + message.mentions.members.first().displayName + '__';
             var embedThumbnail = message.mentions.members.first().user.displayAvatarURL();
 
-            var userData = await fetch("https://najemi.cz/czechifyapi/words/?action=getUserData&userID=" + message.mentions.members.first().id).then(res => res.text())
+            var userData = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + message.mentions.members.first().id).then(res => res.text())
             if (userData == 'User not found') userData = false; else userData = JSON.parse(userData);
 
-            var thanksData = JSON.parse(await fetch("https://najemi.cz/czechifyapi/discord/thanks/?action=fetch").then(res => res.text()))
+            var thanksData = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=fetch").then(res => res.text()))
             if (thanksData[message.mentions.members.first().id]) thanksData = thanksData[message.mentions.members.first().id]; else thanksData = false;
 
-            var moreData = JSON.parse(await fetch("https://najemi.cz/czechifyapi/discord/stats/?action=fetch").then(res => res.text()))
+            var moreData = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/stats/?action=fetch").then(res => res.text()))
             if (moreData['users'][message.mentions.members.first().id]) moreData = moreData['users'][message.mentions.members.first().id]; else moreData = false;
 
             //var channel = await global.findAChannel(0, message.guild, "general");
@@ -60,13 +60,13 @@ module.exports = {
             var embedTitle = '__' + message.member.displayName + '__';
             var embedThumbnail = message.author.displayAvatarURL();
 
-            var userData = await fetch("https://najemi.cz/czechifyapi/words/?action=getUserData&userID=" + message.member.id).then(res => res.text())
+            var userData = await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/?action=getUserData&userID=" + message.member.id).then(res => res.text())
             if (userData == 'User not found') userData = false; else userData = JSON.parse(userData);
 
-            var thanksData = JSON.parse(await fetch("https://najemi.cz/czechifyapi/discord/thanks/?action=fetch").then(res => res.text()))
+            var thanksData = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/thanks/?action=fetch").then(res => res.text()))
             if (thanksData[message.author.id]) thanksData = thanksData[message.author.id]; else thanksData = false;
 
-            var moreData = JSON.parse(await fetch("https://najemi.cz/czechifyapi/discord/stats/?action=fetch").then(res => res.text()))
+            var moreData = JSON.parse(await fetch("https://martinnaj27707.ipage.com/martin/partners/plankto/stats/?action=fetch").then(res => res.text()))
             if (moreData['users'][message.author.id]) moreData = moreData['users'][message.author.id]; else moreData = false;
 
             //var channel = await global.findAChannel(0, message.guild, "general");
