@@ -11,7 +11,7 @@ module.exports = {
                     { name: ':flag_cz:\u200B', value: `Musíš napsat jména rolí přes čárku!` },
                     { name: ':flag_gb:\u200B', value: `Write the names of the roles with comma!` }
                 )
-                .setThumbnail("https://imgur.com/lDIeEaU");
+                .setThumbnail("https://i.imgur.com/5UxthxL.png");
             message.channel.send(embed)
                 .then(msg => msg.delete({ timeout: 5000 }));
         } else {

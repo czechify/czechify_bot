@@ -2,22 +2,36 @@ const discord = require('discord.js');
 module.exports = {
     run: async(client, message, args)  => {
     if(!message.member.hasPermission(["KICK_MEMBERS", "BAN_MEMBERS"])) {
+
+        var booknames = require('../../booklist')
+        var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
         let embed = new discord.MessageEmbed();
         embed
-        .setDescription("**Podvodníku**")
-        .setColor('#ff3c36')
-        .setAuthor(`Toho neztlumíš`)
-        .setThumbnail("https://imgur.com/lDIeEaU");
-        message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+        .setDescription(`Nesmíš! OwO`)
+        .setColor('#fcfcfc')
+        .setAuthor(`Ne >:C`)
+        message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
         message.delete();
     }
     else{
+        //let time = message.content.toLowerCase().substring(message.content.indexOf(' ')+1);
         let memberId = message.mentions.users.first();
         let mutedMember = message.guild.members.cache.get(memberId.id);
         if(mutedMember){
             if(mutedMember.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']) 
             && !message.member.hasPermission("ADMINISTRATOR")){
-                message.channel.send("Toho neztlumíš");
+
+                var booknames = require('../../booklist')
+                var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
+                let embed = new discord.MessageEmbed();
+                embed
+                .setDescription(`Nesmíš! OwO`)
+                .setColor('#fcfcfc')
+                .setAuthor(`Ne >:C`)
+                message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
+                message.delete();
             }
             else {
                 let mutedRole = message.guild.roles.cache.find(role => role.name === "Ztlumeno");
@@ -25,17 +39,17 @@ module.exports = {
                     mutedMember.roles.add(mutedRole);
                     let embed = new discord.MessageEmbed();
                     embed
-                    .setDescription("**Hurá** :tada:")
-                    .setColor('#ff3c36')
-                    .setAuthor(`Uživatel ${mutedMember.displayName} byl ztlumen!`)
-                    .setThumbnail("https://imgur.com/bTRIPNE");
+                    .setColor('#fafafa')
+                    .setDescription(`${mutedMember} teď nemůže mluvit :O`)
                     message.channel.send(embed);
                     }else{
-                        message.channel.send("Nebyla nalezena role pro ztlumení");
+                        message.channel.send("Nenašel jsem!!!");
                     }
             }
         }
         Log(mutedMember);
+        message.delete();
+
     }
 
     function Log(member) {

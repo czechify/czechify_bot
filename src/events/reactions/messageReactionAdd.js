@@ -1,36 +1,47 @@
+
+const discord = require('discord.js');
+const fs = require('fs')
+
 module.exports = async (client, reaction, user) => {
     
+    let message = reaction.message, emoji = reaction.emoji;
 
-    
+    if (emoji.name == '✅') {
 
+        
+    fs.readFile('./src/commands/fun/chessstats.json', 'utf8', async function readFileCallback(err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            obj = JSON.parse(data);
 
-    // let addMemberRole = (emojiRoleMappings) => {
-    //     if(emojiRoleMappings.hasOwnProperty(reaction.emoji.id)) {
-    //         let roleId = emojiRoleMappings[reaction.emoji.id];
-    //         let role = reaction.message.guild.roles.cache.get(roleId);
-    //         let member = reaction.message.guild.members.cache.get(user.id);
-    //         if(role && member) {
-    //             member.roles.add(role);
-    //         }
-    //     }
-    // }
-    // if(reaction.message.partial) {
-    //     await reaction.message.fetch();
-    //     let { id } = reaction.message;
-    //     try {
-    //         let msgDocument = await MessageModel.findOne({ messageId: id });
-    //         if(msgDocument) {
-    //             client.cachedMessageReactions.set(id, msgDocument.emojiRoleMappings);
-    //             let { emojiRoleMappings } = msgDocument;
-    //             addMemberRole(emojiRoleMappings);
-    //         }
-    //     }
-    //     catch(err) {
-    //         console.log(err);
-    //     }
-    // }
-    // else {
-    //     let emojiRoleMappings = client.cachedMessageReactions.get(reaction.message.id);
-    //     addMemberRole(emojiRoleMappings);
-    // }
+            if (user) {
+                var newObj = {
+                    "id": user.id,
+                    "win": 0,
+                    "loss": 0
+                  }
+                  obj[user.id] = newObj;
+
+                  json = JSON.stringify(obj, null, 4);
+
+                  fs.writeFile('./src/commands/fun/chessstats.json', json, 'utf8', (err, content) => {
+                    if (err) {
+                        console.log("File read failed:", err)
+                        return
+                    }
+                })
+            }                 
+}
+})
+
+        let embed = new discord.MessageEmbed();
+        embed
+        .setDescription(`${message.guild.member(user)} SE PŘIDAL/A K TURNAJI!!! <:joooo:735501352792227845>`)
+        .setColor('#fcfcfc')
+        .setAuthor(`JOOOOOOO`)
+
+                reaction.message.channel.send(embed)
+            
+    }
 }

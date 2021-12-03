@@ -10,7 +10,7 @@ module.exports = {
                     { name: ':flag_cz:\u200B', value: `Musíš napsat jméno země anglicky!` },
                     { name: ':flag_gb:\u200B', value: `Write the name of your country in English!` }
                 )
-                .setThumbnail("https://imgur.com/lDIeEaU");
+                .setThumbnail("https://i.imgur.com/5UxthxL.png");
             message.channel.send(embed)
                 .then(msg => msg.delete({ timeout: 5000 }));
         } else {
@@ -39,14 +39,12 @@ module.exports = {
 
                             if (oldRole.comparePositionTo(firstCountry) <= 0) {
                                 if (message.member.roles.cache.has(oldRole.id)) {
-                                    //console.log(oldRole.name);
                                     message.member.roles.remove(oldRole)
                                         .catch(err => {
                                             AddRole(role);
                                         });
                                 }
                             } else {
-                                //console.log('fine role');
                             }
                         });
                     }

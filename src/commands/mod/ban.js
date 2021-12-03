@@ -2,26 +2,26 @@ const discord = require('discord.js');
 module.exports = {
     run: async(client, message, args)  => {
 if(!message.member.hasPermission('BAN_MEMBERS')){
+
     let embed = new discord.MessageEmbed();
+    var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
     embed
-    .setDescription("**Podvodníku**")
-    .setColor('#ff3c36')
-    .setAuthor(`To bys chtěl co?`)
-    .setThumbnail("https://imgur.com/lDIeEaU");
-    message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
-    message.delete();
+        .setDescription(`Nesmíš! OwO`)
+        .setColor('#fcfcfc')
+        .setAuthor(`Ne >:C`)
+        message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
+        message.delete();
 }else{
     let memberId = message.mentions.users.first();
     let reason = message.content.substr(`      ${memberId}`.length);
     try{
-        console.log(`Uživatel ${memberId.username} byl zabanován za ${reason}`);
         let embed = new discord.MessageEmbed();
         embed
         .addField("Příčina", reason)
-        .setDescription("**Hurá** :tada:")
-        .setColor('#ff3c36')
-        .setAuthor(`Uživatel ${memberId.username} byl zabanován!`)
-        .setThumbnail("https://imgur.com/c7HCgta");
+        .setDescription("**:C**")
+        .setColor('#fafafa')
+        .setAuthor(`Užiuateu ${memberId.username} byl zabanován!`);
         message.channel.send(embed);
         Log(memberId, reason);
         let bannedMember = await message.guild.members.fetch(memberId.id);

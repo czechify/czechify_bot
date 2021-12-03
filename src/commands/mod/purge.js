@@ -3,13 +3,16 @@ const discord = require('discord.js');
 module.exports = {
     run: async (client, message, args) => {
         if (!message.member.hasPermission('KICK_MEMBERS')) {
+
+            var booknames = require('../../booklist')
+            var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+            
             let embed = new discord.MessageEmbed();
             embed
-                .setDescription("**Podvodníku**")
-                .setColor('#ff3c36')
-                .setAuthor(`Sám se očisti!`)
-                .setThumbnail("https://imgur.com/lDIeEaU");
-            message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+            .setDescription(`Nesmíš! OwO`)
+            .setColor('#fcfcfc')
+            .setAuthor(`Ne >:C`)
+            message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
             message.delete();
 
         }

@@ -2,13 +2,18 @@ const discord = require('discord.js');
 module.exports = {
     run: async(client, message, args)  => {
 if(!message.member.hasPermission(["KICK_MEMBERS", "BAN_MEMBERS"])) {
+
+    var booknames = require('../../booklist')
+
     let embed = new discord.MessageEmbed();
+    var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
+
     embed
-    .setDescription("**Podvodníku**")
-    .setColor('#ff3c36')
-    .setAuthor(`Sám se odtlum`)
-    .setThumbnail("https://imgur.com/lDIeEaU");
-    message.channel.send(embed).then(msg => msg.delete({ timeout: 5000 }));
+    .setDescription(`Nesmíš! OwO`)
+    .setColor('#fcfcfc')
+    .setAuthor(`Ne >:C`)
+    message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
     message.delete();
 }
 else{
@@ -18,13 +23,15 @@ else{
     if(mutedMember){
         if(mutedMember.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']) 
         && !message.member.hasPermission("ADMINISTRATOR")){
+            var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
             let embed = new discord.MessageEmbed();
             embed
-            .setDescription("**NE!** :tada:")
-            .setColor('#ff3c36')
-            .setAuthor(`Toho neodtlumíš`)
-            .setThumbnail("https://imgur.com/lDIeEaU");
-            message.channel.send(embed);
+            .setDescription(`Nesmíš! OwO`)
+            .setColor('#fcfcfc')
+            .setAuthor(`Ne >:C`)
+            message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
+            message.delete();
         }
         else {
             let mutedRole = message.guild.roles.cache.find(role => role.name === "Ztlumeno");
@@ -32,14 +39,14 @@ else{
                 mutedMember.roles.remove(mutedRole);
                 let embed = new discord.MessageEmbed();
                 embed
-                .setDescription("**Příště pozor jo**")
-                .setColor('#ff3c36')
-                .setAuthor(`Uživatel ${mutedMember.displayName} byl odtlumen!`)
-                .setThumbnail("https://imgur.com/7UW9J2N");
+                .setDescription("**Pfíště posor, jů? C:**")
+                .setColor('#fafafa')
+                .setDescription(`${mutedMember} může povídat!! :3`)
                 message.channel.send(embed);
                 }else{
-                    message.channel.send("Nebyla nalezena role pro ztlumení");
+                    message.channel.send("Nejde toooo :C");
                 }
+                message.delete();
         }
     }
 

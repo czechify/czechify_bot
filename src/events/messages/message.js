@@ -1,25 +1,34 @@
+const messagecount = require('./../../commands/member/messagecount');
+
 const PREFIX = process.env.PREFIX;
-const thanksWords = ["thanks", "thank you","díky", "děkuji", "thnx", "thx", "thnks", "děkuju", "спс", "спасибо", "спасибочки", "спасиб", "пасиб", "thnk", "thks" ];
+
 
 module.exports = (client, message) => {
+    var common = require('./../../commands/member/messagecount');
+
     if(message.author.bot) return;
     if(!message.content.startsWith(PREFIX)) {
-        if(thanksWords.some(word => message.content.toLowerCase().includes(word))){
-            client.commands.get("thanks")(client, message);
+        common.do(message);
+
+        if (message.channel.id === '735043848757051467') {
+            common.foo(message);
+        }
+        if (message.content.toLowerCase() == "bote"){
+            message.channel.send("No?");
             return;
-        }else if(message.content == "!d bump") {
-            client.commands.get("bumpreminder")(client, message);
-            return;
+        }
+        else if (message.content.toLowerCase().includes("bote")){
+            common.ans(message);
         }
     }else{
-        let cmdName = message.content.substring(message.content.indexOf(PREFIX)+1).split(new RegExp(/\s+/)).shift();
-        let argsToParse = message.content.substring(message.content.indexOf(' ')+1);
-        if(client.commands.get(cmdName)) {
-            client.commands.get(cmdName)(client, message, argsToParse);
+    let cmdName = message.content.substring(message.content.indexOf(PREFIX)+1).split(new RegExp(/\s+/)).shift();
+    let argsToParse = message.content.substring(message.content.indexOf(' ')+1);
+    if(client.commands.get(cmdName)) {
+        client.commands.get(cmdName)(client, message, argsToParse);
         }
-        else{
-            console.log("Příkaz neexistuje");
-        }
+    else{
+        console.log("Příkaz neexistuje");
     }
+}
     
 };

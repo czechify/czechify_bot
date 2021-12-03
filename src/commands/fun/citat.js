@@ -8,10 +8,9 @@ if(embedContent == message.content){
     let embed = new discord.MessageEmbed()
     .setColor("#ffa530")
     .addFields(
-        { name: ':flag_cz:', value: `Musíš napsat, co chceš říct!` },
-        { name: ':flag_gb:', value: `Write what you want to say!` }
+        { name: 'u200B', value: `Musíš napsat, co chceš říct!` },
     )
-    .setThumbnail("https://i.imgur.com/5UxthxL.png");
+    .setThumbnail("https://i.imgur.com/UbPcufD.png");
     message.channel.send(embed)
     .then(msg => msg.delete({ timeout: 5000 }));
 }else{
@@ -19,7 +18,7 @@ let embed = new discord.MessageEmbed()
 .setTitle(`${message.member.displayName}:`)
 .setDescription(embedContent)
 .setColor('#ffa530')
-.setThumbnail("https://i.imgur.com/5UxthxL.png");
+.setThumbnail("https://i.imgur.com/UbPcufD.png");
 message.channel.send(embed);
 message.delete();
 }

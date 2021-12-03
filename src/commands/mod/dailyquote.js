@@ -3,23 +3,27 @@ module.exports = {
     run: async(client, message, args)  => {
         
 let embedContent = message.content.substring(message.content.indexOf(' ')+1);
-let quoteChannel = client.channels.cache.find(role => role.name === "📜denní-citát");
+let quoteChannel = client.channels.cache.find(role => role.name === "🔳daily-quote");
 
 if(embedContent == message.content){
+
+    var booknames = require('../../booklist')
+
+    let embed = new discord.MessageEmbed();
+    var bookname = booknames[Math.floor(Math.random() * booknames.length)];
+
+
+    embed
+    .setDescription(`Nesmíš! OwO`)
+    .setColor('#fcfcfc')
+    .setAuthor(`Ne >:C`)
+    message.channel.send(embed).then(msg => msg.delete({ timeout: 10000 }));
     message.delete();
-    let embed = new discord.MessageEmbed()
-    .setColor("#ffa530")
-    .addFields(
-        { name: ':flag_cz:', value: `Musíš napsat, co chceš říct!` },
-        { name: ':flag_gb:', value: `Write what you want to say!` }
-    )
-    message.channel.send(embed)
-    .then(msg => msg.delete({ timeout: 5000 }));
 }else{
 let embed = new discord.MessageEmbed()
 .setTitle(`__Denní citát__`)
 .setDescription(embedContent)
-.setColor('#ffa530')
+.setColor('#fafafa')
 quoteChannel.send(embed);
 }
 },

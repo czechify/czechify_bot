@@ -1,6 +1,4 @@
 require('dotenv').config();
-const fetch = require('node-fetch');
-
 const discord = require('discord.js');
 const client = new discord.Client({ partials: ['MESSAGE', 'REACTION']});
 const fs = require('fs').promises;
@@ -13,7 +11,7 @@ const commandStatus = [
 
 const cachedMessageReactions = new Map();
 
-client.login("NzE0Mjk4OTU5OTMzNDcyODM5.Xssovw.YA1aLbec3SNz3SkM9dN6yTJe0EQ");
+client.login(process.env.BOT_TOKEN);
 client.commands = new Map();
 
         (async function registerCommands(dir = 'commands')
