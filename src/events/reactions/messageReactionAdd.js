@@ -21,7 +21,7 @@ async function addRoleAndSend(member, role, channel) {
     var embed = new discord.MessageEmbed()
         .setColor(role.color)
         .addFields(
-            { name: ':flag_gb:\u200B', value: `Now you're **${level}**! Congrats! :tada:\nDid you set your country with **/imfrom** yet?` },
+            { name: ':flag_gb:\u200B', value: `Now you're **${level}**! Congrats! :tada:\nHave you set your country with **/imfrom** yet?` },
             { name: ':flag_cz:\u200B', value: `Teď máš **${levelCzech}** úroveň! Gratuluji! :tada:\nUž sis nastavil svojí zemi s pomocí **/pochazimz**? ` }
         )
         .setFooter(member.displayName, member.user.displayAvatarURL());
@@ -29,22 +29,32 @@ async function addRoleAndSend(member, role, channel) {
 }
 
 module.exports = async (client, reaction, user1) => {
-    var roles = global.sortByKey(await global.findRoles(reaction.message.guild, 0, ["Beginner", "Intermediate", "Advanced", "Fluent", "Native Speaker", "Learning Czech"]), "name");
-    if ((global.levelMessages.includes(reaction.message.id))&&(["_beginner", "_intermediate", "_advanced", "_fluent", "_native_speaker"].includes(reaction.emoji.name))&&(!(user1.bot))) {
+    var allowedEmojis1 = ["_beginner", "_intermediate", "_advanced", "_fluent", "_native_speaker"];
+    if ((!(user1.bot))&&(reaction.message)&&(reaction.message.changeLevelMessage)) {
+        var roles = global.sortByKey(await global.findRoles(reaction.message.guild, 0, ["Beginner", "Intermediate", "Advanced", "Fluent", "Native Speaker", "Learning Czech"]), "name");
         reaction.message.reactions.cache.forEach(async (reactionSet) => {
-            if (reactionSet['count'] > 1) {
-                reactionSet.users.cache.forEach(async (user) => {
-                    if (user.id == user1.id) {
-                        member = await global.findMember(reaction.message.guild, user.id)
-                        roles.forEach(async(role) => { if (member.roles.cache.has(role.id)) await member.roles.remove(role); })
-                        var roleName = reaction._emoji.name;
-                        while (roleName.includes("_")) roleName = roleName.replace("_", " ");
-                        var roleToAdd = await global.findARole(member.guild, 0, global.titleCase(roleName.trim()));
-                        addRoleAndSend(member, roleToAdd, reaction.message.channel)
-                        reactionSet.users.remove(user.id)
-                    }
-                })
-            }
+            if (!(allowedEmojis1.includes(reactionSet['_emoji']['name']))) { reactionSet.remove(); return; }
+            if (reactionSet.count > 1) reactionSet.users.cache.forEach(async(user) => { if (!(user.id == client.user.id)) {
+                member = await global.findMember(reaction.message.guild, user.id)
+                reactionSet.users.remove(user.id)
+                roles.forEach(async(role) => { if (member.roles.cache.has(role.id)) await member.roles.remove(role); })
+                var roleName = reaction._emoji.name.substring(1);
+                while (roleName.includes("_")) roleName = roleName.replace("_", " ");
+                roles.forEach(async(role) => { if (role.name == global.titleCase(roleName.trim())) addRoleAndSend(member, role, reaction.message.channel); })
+            }})
         })
     }
+    var allowedEmojis2 = ['👍', '👎'];
+    if ((!(user1.bot))&&(reaction.message)&&(reaction.message.poll)) {
+        if (reaction.message.rigged) allowedEmojis2 = ['👍'];
+        var roles = global.sortByKey(await global.findRoles(reaction.message.guild, 0, ["Beginner", "Intermediate", "Advanced", "Fluent", "Native Speaker", "Learning Czech"]), "name");
+        duplicateUsers = [];
+        usersReacted = [];
+        reaction.message.reactions.cache.forEach(async (reactionSet) => {
+            if (!(allowedEmojis2.includes(reactionSet['_emoji']['name']))) { reactionSet.remove(); return; }
+            reactionSet.users.cache.forEach(async(user) => { if (!(user.id == client.user.id)) { if (usersReacted.includes(user.id)) { duplicateUsers.push(user.id); } else usersReacted.push(user.id); }})
+        })
+        reaction.message.reactions.cache.forEach(async (reactionSet) => { reactionSet.users.cache.forEach(async(user) => { if (!(user.id == client.user.id)) { if (duplicateUsers.includes(user.id)) reactionSet.users.remove(user.id); }}) })
+    }
+
 }

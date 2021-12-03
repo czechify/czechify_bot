@@ -165,9 +165,8 @@ module.exports = {
                         type: 'text',
                         parent: category,
                         permissionOverwrites: [
-                            { id: message.member.guild.id, deny: ['SEND_MESSAGES'], },
-                            { id: message.member.guild.id, deny: ['SEND_MESSAGES'], },
-                            { learningCZID: message.author.id, allow: ['SEND_MESSAGES'], },
+                            { id: message.guild.id, deny: ['SEND_MESSAGES'], },
+                            { id: message.author.id, allow: ['SEND_MESSAGES'], },
                         ],
                     });
                     let embedder = new discord.MessageEmbed()

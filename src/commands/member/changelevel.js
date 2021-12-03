@@ -21,8 +21,8 @@ module.exports = {
             )
         var ReactionMessage = await message.channel.send(embed)
         await global.react(ReactionMessage, [emojis[1], emojis[3], emojis[0], emojis[2], emojis[4]]);
-        global.levelMessages.push(ReactionMessage.id);
-        //setTimeout(function() { ReactionMessage.delete(); }, time);
+        ReactionMessage.changeLevelMessage = true;
+        setTimeout(function() { ReactionMessage.delete(); }, time);
     },
     descriptionCZ: "Nastav si úroveň češtiny",
     descriptionEN: "Set your Czech level!",

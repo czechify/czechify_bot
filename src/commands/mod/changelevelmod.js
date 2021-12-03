@@ -21,7 +21,7 @@ module.exports = {
             )
         var ReactionMessage = await message.channel.send(embed)
         await global.react(ReactionMessage, [emojis[1], emojis[3], emojis[0], emojis[2], emojis[4]]);
-        global.levelMessages.push(ReactionMessage.id);
+        ReactionMessage.changeLevelMessage = true;
     },
     descriptionCZ: "clm",
     descriptionEN: "clm",
